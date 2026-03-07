@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_color_switch_app/appbar.dart';
-import 'package:image_color_switch_app/content.dart';
+import 'screens/home_screen.dart';
 
 void main() {
-  // SystemChrome.setSystemUIOverlayStyle(
-  //   const SystemUiOverlayStyle(
-  //     statusBarColor: Color(0xFFFFFFFF),
-  //     statusBarIconBrightness: Brightness.dark,
-  //     statusBarBrightness: Brightness.dark,
-  //   ),
-  // );
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+  ));
   runApp(const MyApp());
 }
 
@@ -19,9 +17,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      title: 'Color Themes',
       debugShowCheckedModeBanner: false,
-      home: Scaffold(appBar: MyAppBar(), body: MyContent()),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: const Color(0xFF6750A4),
+      ),
+      home: const HomeScreen(),
     );
   }
 }

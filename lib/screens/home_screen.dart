@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/theme_item.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,40 +25,61 @@ class _HomeScreenState extends State<HomeScreen> {
     final theme = _current;
     final accent = theme.color;
 
-    return Scaffold(
-      body: AnimatedContainer(
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.lerp(accent, Colors.black, 0.15)!,
-              Color.lerp(accent, Colors.black, 0.55)!,
-              const Color(0xFF080B14),
-            ],
-            stops: const [0.0, 0.45, 1.0],
+    final topColor = Color.lerp(accent, Colors.black, 0.15)!;
+    // Bottom of gradient is always near this dark colour
+    const bottomColor = Color(0xFF080B14);
+    final statusIconBrightness =
+        ThemeData.estimateBrightnessForColor(topColor) == Brightness.light
+        ? Brightness.dark
+        : Brightness.light;
+    final navIconBrightness =
+        ThemeData.estimateBrightnessForColor(bottomColor) == Brightness.light
+        ? Brightness.dark
+        : Brightness.light;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: statusIconBrightness,
+        statusBarBrightness: statusIconBrightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: navIconBrightness,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        body: AnimatedContainer(
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.lerp(accent, Colors.black, 0.15)!,
+                Color.lerp(accent, Colors.black, 0.55)!,
+                const Color(0xFF080B14),
+              ],
+              stops: const [0.0, 0.45, 1.0],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _Header(accent: accent),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                  child: _ImageCard(theme: theme),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _Header(accent: accent),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                    child: _ImageCard(theme: theme),
+                  ),
                 ),
-              ),
-              const _PaletteLabel(),
-              _Palette(
-                selectedIndex: _selectedIndex,
-                onSelect: _select,
-              ),
-              const SizedBox(height: 12),
-            ],
+                const _PaletteLabel(),
+                _Palette(selectedIndex: _selectedIndex, onSelect: _select),
+                const SizedBox(height: 12),
+              ],
+            ),
           ),
         ),
       ),
@@ -137,7 +159,11 @@ class _AvatarBadge extends StatelessWidget {
             width: 46,
             height: 46,
             color: accent.withValues(alpha: 0.3),
-            child: const Icon(Icons.person_rounded, color: Colors.white, size: 24),
+            child: const Icon(
+              Icons.person_rounded,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
         ),
       ),
@@ -197,7 +223,7 @@ class _ImageCard extends StatelessWidget {
                         if (progress == null) return child;
                         final pct = progress.expectedTotalBytes != null
                             ? progress.cumulativeBytesLoaded /
-                                progress.expectedTotalBytes!
+                                  progress.expectedTotalBytes!
                             : null;
                         return Center(
                           child: Column(
@@ -355,8 +381,8 @@ class _ColorChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = ThemeData.estimateBrightnessForColor(item.color) ==
-            Brightness.light
+    final iconColor =
+        ThemeData.estimateBrightnessForColor(item.color) == Brightness.light
         ? Colors.black.withValues(alpha: 0.65)
         : Colors.white;
 
@@ -397,11 +423,7 @@ class _ColorChip extends StatelessWidget {
           ),
           child: isSelected
               ? Center(
-                  child: Icon(
-                    Icons.check_rounded,
-                    color: iconColor,
-                    size: 22,
-                  ),
+                  child: Icon(Icons.check_rounded, color: iconColor, size: 22),
                 )
               : null,
         ),
